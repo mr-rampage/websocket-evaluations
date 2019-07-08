@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Auction</title>
+    <script>
+const socket = new WebSocket('ws://localhost/auction');
+
+socket.onopen = function() {
+  log("[open] Connection established, send -> server");
+};
+
+socket.onmessage = function(event) {
+  log(`[message] Data received: ${event.data} <- server`);
+};
+
+socket.onclose = function(event) {
+  if (event.wasClean) {
+    log(`[close] Connection closed cleanly, code=${event.code} reason=${event.reason}`);
+  } else {
+    log('[close] Connection died');
+  }
+};
+
+socket.onerror = function(error) {
+  log(`[error] ${error.message}`);
+};
+
+function bid() {
+  log("[send] Sending a bid, send -> server");
+  socket.send(JSON.stringify({ type: 'bid', message: document.querySelector('#my_bid_value').value }));
+}
+
+function log(message) {
+  document.querySelector('pre').textContent += message + '\n';
+}
+    </script>
+</head>
+<body>
+<h3>Auction 1</h3>
+<div id="dom_console"></div>
+<form>
+    Current price:
+    <div>
+        <label for="my_bid_value">Your offer:</label>
+        <input id="my_bid_value" type="text">
+        <input type="button" onclick="bid();" value="Bid">
+    </div>
+    <div>
+        Feed:
+        <pre></pre>
+    </div>
+</form>
+</body>
+</html>
