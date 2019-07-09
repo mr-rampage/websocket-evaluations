@@ -2,22 +2,15 @@ package ca.wbac.vertx.websocket;
 
 import io.vertx.core.AbstractVerticle;
 import io.vertx.core.Future;
+import io.vertx.core.Handler;
+import io.vertx.core.buffer.Buffer;
 
 public class MainVerticle extends AbstractVerticle {
 
   @Override
-  public void start(Future<Void> startFuture) throws Exception {
-    vertx.createHttpServer().requestHandler(req -> {
-      req.response()
-        .putHeader("content-type", "text/plain")
-        .end("Hello from Vert.x!");
-    }).listen(8888, http -> {
-      if (http.succeeded()) {
-        startFuture.complete();
-        System.out.println("HTTP server started on port 8888");
-      } else {
-        startFuture.fail(http.cause());
-      }
-    });
+  public void start() {
+    vertx.createHttpServer()
+      .websocketHandler(ws -> ws.handler(event -> ws.writeTextMessage("Hello, from the server!")))
+      .listen(8080);
   }
 }

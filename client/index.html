@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <title>Auction</title>
     <script>
-const socket = new WebSocket('ws://localhost/auction');
+const socket = new WebSocket('ws://localhost:8080/auction');
 
 socket.onopen = function() {
   log("[open] Connection established, send -> server");
