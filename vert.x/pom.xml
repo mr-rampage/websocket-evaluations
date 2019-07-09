@@ -22,7 +22,7 @@
     <vertx.version>3.7.1</vertx.version>
     <junit-jupiter.version>5.4.0</junit-jupiter.version>
 
-    <main.verticle>ca.wbac.vertx.websocket.MainVerticle</main.verticle>
+    <main.verticle>ca.wbac.vertx.websocket.Application</main.verticle>
   </properties>
 
   <dependencyManagement>
@@ -42,6 +42,11 @@
         <groupId>io.vertx</groupId>
         <artifactId>vertx-core</artifactId>
       </dependency>
+    <dependency>
+      <groupId>io.vertx</groupId>
+      <artifactId>vertx-hazelcast</artifactId>
+      <version>3.7.1</version>
+    </dependency>
     <dependency>
       <groupId>io.vertx</groupId>
       <artifactId>vertx-junit5</artifactId>
