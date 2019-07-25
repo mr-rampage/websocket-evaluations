@@ -13,7 +13,7 @@ import java.util.concurrent.TimeUnit;
 
 public class MainVerticle extends AbstractVerticle {
 
-  private Disposable socketCounter;
+  private String counterVerticleId;
 
   @Override
   public Completable rxStart() {
@@ -27,18 +27,13 @@ public class MainVerticle extends AbstractVerticle {
         promise.complete(101);
       });
 
-    Flowable<Long> interval = Flowable.interval(1, TimeUnit.SECONDS);
-
-    socketCounter = authenticatedSocket$
-      .flatMap(ws -> interval.map(count -> new AbstractMap.SimpleEntry<>(ws, count)))
-      .filter(pair -> !pair.getKey().isClosed())
-      .subscribe(pair -> pair.getKey().writeTextMessage(pair.getValue().toString()));
+    vertx.deployVerticle(new CounterVerticle(authenticatedSocket$), res -> counterVerticleId = res.result());
 
     return server.rxListen(8080).ignoreElement();
   }
 
   @Override
   public void stop() {
-    socketCounter.dispose();
+    vertx.undeploy(counterVerticleId);
   }
 }
