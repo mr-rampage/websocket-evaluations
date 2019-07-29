@@ -27,7 +27,7 @@ public class CounterVerticle extends AbstractVerticle {
 
     socketCounter = intervalProducer.subscribe(pair -> pair.getKey().writeTextMessage(pair.getValue().toString()));
 
-    return intervalProducer.ignoreElements();
+    return Completable.complete();
   }
 
   @Override

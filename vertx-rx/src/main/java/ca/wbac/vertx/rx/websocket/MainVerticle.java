@@ -2,22 +2,19 @@ package ca.wbac.vertx.rx.websocket;
 
 import io.reactivex.Completable;
 import io.reactivex.Flowable;
-import io.reactivex.disposables.Disposable;
-import io.vertx.reactivex.core.Promise;
 import io.vertx.reactivex.core.AbstractVerticle;
+import io.vertx.reactivex.core.Promise;
 import io.vertx.reactivex.core.http.HttpServer;
 import io.vertx.reactivex.core.http.ServerWebSocket;
 
-import java.util.AbstractMap;
-import java.util.concurrent.TimeUnit;
-
 public class MainVerticle extends AbstractVerticle {
 
-  private String counterVerticleId;
+  private CounterVerticle counterVerticle;
+  private HttpServer server;
 
   @Override
   public Completable rxStart() {
-    HttpServer server = vertx.createHttpServer();
+    server = vertx.createHttpServer();
     Flowable<ServerWebSocket> authenticatedSocket$ = server
       .websocketStream()
       .toFlowable()
@@ -27,13 +24,16 @@ public class MainVerticle extends AbstractVerticle {
         promise.complete(101);
       });
 
-    vertx.deployVerticle(new CounterVerticle(authenticatedSocket$), res -> counterVerticleId = res.result());
+    counterVerticle = new CounterVerticle(authenticatedSocket$);
 
-    return server.rxListen(8080).ignoreElement();
+    return vertx.rxDeployVerticle(counterVerticle)
+      .flatMap(pid -> server.rxListen(8080))
+      .ignoreElement();
   }
 
   @Override
   public void stop() {
-    vertx.undeploy(counterVerticleId);
+    vertx.undeploy(counterVerticle.deploymentID());
+    server.close();
   }
 }
